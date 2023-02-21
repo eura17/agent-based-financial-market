@@ -2,13 +2,13 @@
 name = "agent-based-financial-market"
 version = "0.1.0"
 description = ""
-authors = ["Andrey Babkibkin, Ismail Toktonyazov"]
+authors = ["Andrey Babkin, Ismail Toktonyazov"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "agent_based_financial_market"}]
+packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 
 [build-system]
 requires = ["poetry-core"]
