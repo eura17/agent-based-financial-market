@@ -1,7 +1,20 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from enum import Enum
 from typing import Optional
 
-from src.core.order import Order, OrderType
+
+class OrderType(Enum):
+    BUY = "buy"
+    SELL = "sell"
+
+
+@dataclass(slots=True)
+class Order:
+    type: OrderType
+    price: float
+    quantity: int
+    agent: "Agent"
 
 
 class Agent(ABC):
@@ -10,7 +23,7 @@ class Agent(ABC):
         self.stocks = stocks
 
     @abstractmethod
-    def make_order(self, last_price: float) -> Optional[Order]: ...
+    def make_decision(self, last_price: float) -> Optional[Order]: ...
 
     def total_equity(self, stock_price: float) -> float:
         return self.cash + self.stocks * stock_price
@@ -26,6 +39,7 @@ class Agent(ABC):
             type=OrderType.BUY,
             price=price,
             quantity=quantity,
+            agent=self,
         )
 
     def create_sell_order(self, price: float, quantity: int) -> Order:
@@ -33,4 +47,5 @@ class Agent(ABC):
             type=OrderType.SELL,
             price=price,
             quantity=quantity,
+            agent=self,
         )

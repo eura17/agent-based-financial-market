@@ -18,17 +18,15 @@ class Engine:
 
         shuffle(agents)
         for agent in agents:
-            order = agent.make_order(last_price)
+            order = agent.make_decision(last_price)
             if order is not None:
-                self.order_book.register_order(order, agent)
+                self.order_book.register(order)
         
-        trades = self.order_book.match_orders()        
-        for trade in trades:
-            trade.buyer.update_cash(-trade.cost)
-            trade.seller.update_cash(+trade.cost)
-            trade.buyer.update_stocks(+trade.quantity)
-            trade.seller.update_stocks(-trade.quantity)
+        transactions = self.order_book.match_orders()        
+        for transaction in transactions:
+            transaction.buyer.update_cash(-transaction.cost)
+            transaction.seller.update_cash(+transaction.cost)
+            transaction.buyer.update_stocks(+transaction.quantity)
+            transaction.seller.update_stocks(-transaction.quantity)
 
-        if trades:
-            return trades[-1].price
-        return last_price
+        return transactions[-1].price if transactions else last_price
