@@ -10,6 +10,9 @@ class ZeroIntelligenceTrader(Agent):
         self.noise = noise
 
     def make_decision(self, last_price: float) -> Optional[Order]:
-        price_lower_bound = self.noise * last_price
-        price_upper_bound = (1 + self.noise) * last_price
-        return uniform(price_lower_bound, price_upper_bound)
+        estimated_price = uniform(self.noise * last_price, (1 + self.noise) * last_price)
+        order_factory = self.create_buy_order if estimated_price > last_price else self.create_sell_order
+        return order_factory(
+            price=estimated_price,
+            quantity=self.total_equity(last_price) / estimated_price,
+        )
