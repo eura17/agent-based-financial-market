@@ -12,6 +12,7 @@ class Engine:
         last_price = initial_price
         for _ in range(n_steps):
             last_price = self.step(agents, last_price=last_price)
+            print(_, last_price)
 
     def step(self, agents: list[Agent], last_price: float) -> float:
         self.order_book.drop_orders()

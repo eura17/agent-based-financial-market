@@ -1,6 +1,5 @@
 from statistics import mean
 from typing import Optional
-from queue import Queue
 
 from src.core.agent import Agent, Order
 
@@ -8,13 +7,19 @@ from src.core.agent import Agent, Order
 class TechnicalTrader(Agent):
     def __init__(self, cash: float, stocks: int, window_size: int = 3) -> None:
         super().__init__(cash, stocks)
-        self.window = Queue(maxsize=window_size - 1)
+        self.window_size = window_size - 1
+        self.window = []
+
+    @property
+    def is_window_full(self) -> bool:
+        return len(self.window) == self.window_size
     
     def moving_average(self, last_price: float) -> Optional[float]:
-        self.window.put(last_price)
-        if not self.window.full():
+        self.window.append(last_price)
+        if not self.is_window_full:
             return None
-        return mean(self.window.queue)
+        self.window = self.window[1:]
+        return mean(self.window)
 
 
 class TrendTrader(TechnicalTrader):

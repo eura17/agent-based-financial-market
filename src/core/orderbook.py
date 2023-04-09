@@ -29,7 +29,10 @@ class OrderBook:
 
     def match_orders(self) -> list[Transaction]:
         transactions = []
-        while (best_bid := self.bids.max_price()) >= (best_ask := self.asks.min_price()):
+        while (
+            self.bids.has_orders and self.asks.has_orders 
+            and ((best_bid := self.bids.max_price()) >= (best_ask := self.asks.min_price()))
+        ):
             transaction = self.make_deal(best_bid, best_ask)
             transactions.append(transaction)
         return transactions
@@ -62,6 +65,10 @@ class OrderBook:
 class OrdersList:
     def __init__(self) -> None:
         self.levels: defaultdict[float, deque[Order]] = defaultdict(deque)
+
+    @property
+    def has_orders(self) -> bool:
+        return len(self.levels) > 0
 
     def place(self, order: Order) -> None:
         self.levels[order.price].append(order)
