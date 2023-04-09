@@ -14,7 +14,7 @@ class FundamentalTrader(Agent):
 
     def make_decision(self, last_price: float) -> Optional[Order]:
         self.t += 1
-        estimated_price = self.price0 * (self.pi + self.gdp) ** self.t
+        estimated_price = self.price0 * (1 + self.pi + self.gdp) ** self.t
 
         if estimated_price > last_price:
             return self.create_buy_order(
