@@ -16,6 +16,9 @@ class Order:
     quantity: int
     agent: "Agent"
 
+    def __post_init__(self) -> None:
+        self.quantity = max(self.quantity, 1e-10)
+
 
 class Agent(ABC):
     def __init__(self, cash: float, stocks: int) -> None:

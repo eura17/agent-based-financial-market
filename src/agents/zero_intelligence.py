@@ -14,5 +14,5 @@ class ZeroIntelligenceTrader(Agent):
         order_factory = self.create_buy_order if estimated_price > last_price else self.create_sell_order
         return order_factory(
             price=estimated_price,
-            quantity=self.total_equity(last_price) / estimated_price,
+            quantity=max(self.total_equity(last_price), 0) / estimated_price,
         )
