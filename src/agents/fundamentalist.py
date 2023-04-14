@@ -14,15 +14,14 @@ class FundamentalTrader(Agent):
 
     def make_decision(self, last_price: float) -> Optional[Order]:
         self.t += 1
-        estimated_price = self.price0 * (1 + self.pi + self.gdp) ** self.t
+        price_hat = self.price0 * (1 + self.pi + self.gdp) ** self.t
+        price_diff = abs(price_hat - last_price) / 2
 
-        if estimated_price > last_price:
-            return self.create_buy_order(
-                price=estimated_price,
-                quantity=self.cash * self.pct / estimated_price,
-            )
-        elif (can_sell := min(self.cash * self.pct / estimated_price, self.stocks)) > 0:
-            return self.create_sell_order(
-                price=estimated_price,
-                quantity=can_sell,
-            )
+        if price_hat > last_price:
+            price = last_price + price_diff
+            quantity = self.cash * self.pct / price
+            return self.create_buy_order(price, quantity)
+        else:
+            price = max(last_price - price_diff, 1e-10)
+            quantity = self.stocks * self.pct
+            return self.create_sell_order(price, quantity)

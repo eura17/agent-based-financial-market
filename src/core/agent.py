@@ -25,6 +25,8 @@ class Agent(ABC):
         self.cash = cash
         self.stocks = stocks
 
+        self.is_bankrupt = False
+
     @abstractmethod
     def make_decision(self, last_price: float) -> Optional[Order]: ...
 
