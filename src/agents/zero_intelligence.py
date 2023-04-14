@@ -13,16 +13,14 @@ class ZeroIntelligenceTrader(Agent):
         price_hat = uniform(self.noise * last_price, (1 + self.noise) * last_price)
 
         if random() > 0.5:
-            order_factory = self.create_buy_order
             if self.stocks >= 0:
                 quantity = self.cash / price_hat
             else:
                 quantity = -self.stocks + (self.cash + self.stocks * price_hat) / price_hat
+            return self.create_buy_order(price_hat, quantity)
         else:
-            order_factory = self.create_sell_order
             if self.stocks <= 0:
-                quantity = self.cash / price_hat
+                quantity = (self.cash + 2 * self.stocks * price_hat) / price_hat
             else:
                 quantity = self.stocks + (self.cash + self.stocks * price_hat) / price_hat
-
-        return order_factory(price=price_hat, quantity=quantity)
+            return self.create_sell_order(price_hat, quantity)
