@@ -23,7 +23,7 @@ class Engine:
         shuffle(agents)
         orders = []
         for agent in agents:
-            if agent.total_equity(last_price) < 0:
+            if agent.is_bankrupt:
                 continue
             order = agent.make_decision(last_price)
             if order is not None:

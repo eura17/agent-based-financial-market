@@ -1,4 +1,4 @@
-from random import uniform
+from random import uniform, random
 from typing import Optional
 
 from src.core.agent import Agent, Order
@@ -10,9 +10,19 @@ class ZeroIntelligenceTrader(Agent):
         self.noise = noise
 
     def make_decision(self, last_price: float) -> Optional[Order]:
-        estimated_price = uniform(self.noise * last_price, (1 + self.noise) * last_price)
-        order_factory = self.create_buy_order if estimated_price > last_price else self.create_sell_order
-        return order_factory(
-            price=estimated_price,
-            quantity=max(self.total_equity(last_price), 0) / estimated_price,
-        )
+        price_hat = uniform(self.noise * last_price, (1 + self.noise) * last_price)
+
+        if random() > 0.5:
+            order_factory = self.create_buy_order
+            if self.stocks >= 0:
+                quantity = self.cash / price_hat
+            else:
+                quantity = -self.stocks + (self.cash + self.stocks * price_hat) / price_hat
+        else:
+            order_factory = self.create_sell_order
+            if self.stocks <= 0:
+                quantity = self.cash / price_hat
+            else:
+                quantity = self.stocks + (self.cash + self.stocks * price_hat) / price_hat
+
+        return order_factory(price=price_hat, quantity=quantity)
