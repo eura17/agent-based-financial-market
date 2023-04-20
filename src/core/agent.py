@@ -38,6 +38,9 @@ class Agent(ABC):
 
     def total_equity(self, stock_price: float) -> float:
         return self.cash + self.stocks * stock_price
+    
+    def can_borrow(self, stock_price: float) -> float:
+        return self.total_equity(stock_price) + self.stocks * stock_price
 
     def update_cash(self, diff: float) -> None:
         self.cash += diff

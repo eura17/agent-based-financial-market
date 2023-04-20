@@ -26,47 +26,36 @@ class TechnicalTrader(Agent):
 
 class TrendTrader(TechnicalTrader):
     def make_decision(self, last_price: float) -> Optional[Order]:
-        price_hat = self.moving_average(last_price)
-        if price_hat is None:
-            return
+        if (ma := self.moving_average(last_price)) is None:
+            return None
         
-        price_diff = abs(price_hat - last_price) / 2
-
-        if last_price > price_hat:
-            price = last_price + price_diff
-            if self.stocks >= 0:
-                quantity = self.cash * self.pct / price
-            else:
-                quantity = -self.stocks + (self.cash + self.stocks * price) * self.pct / price
-            return self.create_buy_order(price_hat + price_diff, quantity)
+        price_diff = abs(ma - last_price) / 2
+        if last_price > ma:
+            price_hat = last_price + price_diff
+            if self.cash < 0:
+                return self.create_sell_order(price_hat, (-self.cash / price_hat) * self.pct)
+            return self.create_buy_order(price_hat, (self.cash / price_hat) * self.pct)
         else:
-            price = max(last_price - price_diff, 1e-10)
-            if self.stocks <= 0:
-                quantity = (self.cash + 2 * self.stocks * price) * self.pct / price
-            else:
-                quantity = self.stocks + (self.cash + self.stocks * price) * self.pct / price
-            return self.create_sell_order(price, quantity)
+            price_hat = max(last_price - price_diff, 1e-10)
+            if (can_borrow := self.can_borrow(last_price)) < 0:
+                return self.create_buy_order(price_hat, (-can_borrow / price_hat) * self.pct)
+            return self.create_sell_order(price_hat, (can_borrow / price_hat) * self.pct)
 
 
 class MeanReversionTrader(TechnicalTrader):
     def make_decision(self, last_price: float) -> Optional[Order]:
-        price_hat = self.moving_average(last_price)
-        if price_hat is None:
-            return
+        if (ma := self.moving_average(last_price)) is None:
+            return None
         
-        price_diff = abs(price_hat - last_price) / 2
-
-        if last_price > price_hat:
-            price = max(last_price - price_diff, 1e-10)
-            if self.stocks <= 0:
-                quantity = (self.cash + 2 * self.stocks * price) * self.pct / price
-            else:
-                quantity = self.stocks + (self.cash + self.stocks * price) * self.pct / price
-            return self.create_sell_order(price_hat + price_diff, quantity)
+        price_diff = abs(ma - last_price) / 2
+        if last_price > ma:
+            price_hat = max(last_price - price_diff, 1e-10)
+            if (can_borrow := self.can_borrow(last_price)) < 0:
+                return self.create_buy_order(price_hat, (-can_borrow / price_hat) * self.pct)
+            return self.create_sell_order(price_hat, (can_borrow / price_hat) * self.pct)
         else:
-            price = last_price + price_diff
-            if self.stocks >= 0:
-                quantity = self.cash * self.pct / price
-            else:
-                quantity = -self.stocks + (self.cash + self.stocks * price) * self.pct / price
-            return self.create_buy_order(price, quantity)
+            price_hat = last_price + price_diff
+            if self.cash < 0:
+                return self.create_sell_order(price_hat, (-self.cash / price_hat) * self.pct)
+            return self.create_buy_order(price_hat, (self.cash / price_hat) * self.pct)
+

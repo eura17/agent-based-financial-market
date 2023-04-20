@@ -9,7 +9,6 @@ class Engine:
     def __init__(self) -> None:
         self.order_book = OrderBook()
         self.stats_monitor = StatsMonitor()
-        self.t = []
 
     def run(self, agents: list[Agent], initial_price: float, n_steps: int = 100) -> None:
         last_price = initial_price
@@ -43,5 +42,5 @@ class Engine:
 
             cost += transaction.cost
             volume += transaction.quantity
-        self.t.append(transactions)
+
         return cost / volume if transactions else last_price            
