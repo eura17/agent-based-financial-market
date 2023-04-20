@@ -17,7 +17,13 @@ class Order:
     agent: "Agent"
 
     def __post_init__(self) -> None:
-        self.quantity = max(self.quantity, 1e-10)
+        if self.quantity <= 0:
+            pass
+            # raise ValueError(self)
+    
+    @property
+    def cost(self) -> float:
+        return self.price * self.quantity
 
 
 class Agent(ABC):

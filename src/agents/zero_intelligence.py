@@ -10,17 +10,12 @@ class ZeroIntelligenceTrader(Agent):
         self.noise = noise
 
     def make_decision(self, last_price: float) -> Optional[Order]:
-        price_hat = uniform(self.noise * last_price, (1 + self.noise) * last_price)
-
+        # price_hat = uniform(max(last_price - self.noise, 0), last_price + self.noise)
+        price_hat = uniform((1 - self.noise) * last_price, (1 + self.noise) * last_price)
         if random() > 0.5:
-            if self.stocks >= 0:
-                quantity = self.cash / price_hat
-            else:
-                quantity = -self.stocks + (self.cash + self.stocks * price_hat) / price_hat
-            return self.create_buy_order(price_hat, quantity)
+            if self.cash > 0:
+                return self.create_buy_order(price_hat, self.cash / price_hat)
         else:
-            if self.stocks <= 0:
-                quantity = (self.cash + 2 * self.stocks * price_hat) / price_hat
-            else:
-                quantity = self.stocks + (self.cash + self.stocks * price_hat) / price_hat
-            return self.create_sell_order(price_hat, quantity)
+            ostatok = 2 * self.total_equity(last_price) - self.cash
+            if ostatok > 0:
+                return self.create_sell_order(price_hat, ostatok / price_hat)
