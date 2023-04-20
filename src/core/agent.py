@@ -17,7 +17,13 @@ class Order:
     agent: "Agent"
 
     def __post_init__(self) -> None:
-        self.quantity = max(self.quantity, 1e-10)
+        if self.quantity <= 0:
+            pass
+            # raise ValueError(self)
+    
+    @property
+    def cost(self) -> float:
+        return self.price * self.quantity
 
 
 class Agent(ABC):
@@ -32,6 +38,9 @@ class Agent(ABC):
 
     def total_equity(self, stock_price: float) -> float:
         return self.cash + self.stocks * stock_price
+    
+    def can_borrow(self, stock_price: float) -> float:
+        return self.total_equity(stock_price) + self.stocks * stock_price
 
     def update_cash(self, diff: float) -> None:
         self.cash += diff

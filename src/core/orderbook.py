@@ -41,17 +41,20 @@ class OrderBook:
         bid_order = self.bids.fetch_first(bid_price)
         ask_order = self.asks.fetch_first(ask_price)
 
+        transaction_cost = min(bid_order.cost, ask_order.cost)
+        transaction_price = (bid_order.price + ask_order.price) / 2
+        transaction_quantity = transaction_cost / transaction_price
         transaction = Transaction(
-            price=(bid_order.price + ask_order.price) / 2,
-            quantity=min(bid_order.quantity, ask_order.quantity),
+            price=transaction_price,
+            quantity=transaction_quantity,
             buyer=bid_order.agent,
             seller=ask_order.agent,
         )
 
-        bid_order.quantity -= transaction.quantity
+        bid_order.quantity = (bid_order.cost - transaction_cost) / bid_order.price
         if bid_order.quantity == 0:
             self.bids.drop_first(bid_price)
-        ask_order.quantity -= transaction.quantity
+        ask_order.quantity = (ask_order.cost - transaction_cost) / ask_order.price
         if ask_order.quantity == 0:
             self.asks.drop_first(ask_price)
 
