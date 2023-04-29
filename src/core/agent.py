@@ -26,20 +26,15 @@ class Order:
 
 
 class Agent(ABC):
-    def __init__(self, cash: float, stocks: int) -> None:
-        self.initial_cash, self.cash = cash, cash
-        self.initial_stocks, self.stocks = stocks, stocks
-
-        self.is_bankrupt = False
+    def __init__(self, cash: float, stocks: int = 0) -> None:
+        self.cash = cash
+        self.stocks = stocks
 
     @abstractmethod
     def make_decision(self, last_price: float) -> Optional[Order]: ...
 
     def total_equity(self, stock_price: float) -> float:
         return self.cash + self.stocks * stock_price
-    
-    def can_borrow(self, stock_price: float) -> float:
-        return self.total_equity(stock_price) + self.stocks * stock_price
 
     def update_cash(self, diff: float) -> None:
         self.cash += diff
