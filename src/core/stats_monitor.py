@@ -6,23 +6,21 @@ from src.core.orderbook import Transaction
 
 class StatsMonitor:
     def __init__(self) -> None:
+        self.prices = []
         self.balance_stats = []
         self.supply_demand_stats = []
         self.trade_stats = []
+       
+    def log_price(self, price: float) -> None:
+        self.prices.append(price)
 
     def log_balance_stats(self, agents: list[Agent], last_price: float) -> None:
         stats = defaultdict(Counter)
         for agent in agents:
-            if agent.total_equity(last_price) < 0:
-                agent.update_cash(-agent.cash)
-                agent.update_stocks(-agent.stocks)
-                agent.is_bankrupt = True
-
             agent_type = type(agent)
             stats[agent_type]["total_cash"] += agent.cash
             stats[agent_type]["total_stocks"] += agent.stocks
             stats[agent_type]["total_equity"] += agent.total_equity(last_price)
-            stats[agent_type]["total_bankrupts"] += agent.is_bankrupt
         self.balance_stats.append(stats)
 
     def log_supply_demand_stats(self, orders: list[Order]) -> None:

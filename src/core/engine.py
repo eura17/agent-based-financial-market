@@ -1,5 +1,7 @@
 from random import shuffle
 
+from tqdm import tqdm
+
 from src.core.agent import Agent
 from src.core.orderbook import OrderBook
 from src.core.stats_monitor import StatsMonitor
@@ -12,19 +14,17 @@ class Engine:
 
     def run(self, agents: list[Agent], initial_price: float, n_steps: int = 100) -> None:
         last_price = initial_price
-        for _ in range(n_steps):
+        for _ in tqdm(range(n_steps)):
             last_price = self.step(agents, last_price=last_price)
-            print(_, last_price)
 
     def step(self, agents: list[Agent], last_price: float) -> float:
+        self.stats_monitor.log_price(last_price)
         self.stats_monitor.log_balance_stats(agents, last_price)
         self.order_book.drop_orders()
 
         shuffle(agents)
         orders = []
         for agent in agents:
-            if agent.is_bankrupt:
-                continue
             order = agent.make_decision(last_price)
             if order is not None:
                 orders.append(order)
@@ -42,5 +42,5 @@ class Engine:
 
             cost += transaction.cost
             volume += transaction.quantity
-
+ 
         return cost / volume if transactions else last_price            

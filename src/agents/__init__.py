@@ -1,5 +1,5 @@
 from .etf import ETFTrader
-from .fundamentalist import FundamentalTrader
+from .fundamental import FundamentalTrader
 from .technical import TrendTrader, MeanReversionTrader
 from .zero_intelligence import ZeroIntelligenceTrader
 
