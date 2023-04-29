@@ -17,9 +17,8 @@ class Order:
     agent: "Agent"
 
     def __post_init__(self) -> None:
-        if self.quantity <= 0:
-            pass
-            # raise ValueError(self)
+        if self.price <= 0 or self.quantity <= 0:
+            raise ValueError(self)
     
     @property
     def cost(self) -> float:
@@ -28,8 +27,8 @@ class Order:
 
 class Agent(ABC):
     def __init__(self, cash: float, stocks: int) -> None:
-        self.cash = cash
-        self.stocks = stocks
+        self.initial_cash, self.cash = cash, cash
+        self.initial_stocks, self.stocks = stocks, stocks
 
         self.is_bankrupt = False
 

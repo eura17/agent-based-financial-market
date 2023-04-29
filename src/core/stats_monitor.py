@@ -1,6 +1,7 @@
 from collections import defaultdict, Counter
 from statistics import mean, median
 
+from src.agents.zero_intelligence import ZeroIntelligenceTrader
 from src.core.agent import Order, OrderType, Agent
 from src.core.orderbook import Transaction
 
@@ -17,6 +18,11 @@ class StatsMonitor:
                 agent.update_cash(-agent.cash)
                 agent.update_stocks(-agent.stocks)
                 agent.is_bankrupt = True
+
+                if isinstance(agent, ZeroIntelligenceTrader):
+                    agent.update_cash(agent.initial_cash)
+                    agent.update_stocks(agent.initial_stocks)
+                    agent.is_bankrupt = False
 
             agent_type = type(agent)
             stats[agent_type]["total_cash"] += agent.cash

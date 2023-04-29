@@ -12,10 +12,16 @@ class ZeroIntelligenceTrader(Agent):
     def make_decision(self, last_price: float) -> Optional[Order]:
         price_hat = uniform((1 - self.noise) * last_price, (1 + self.noise) * last_price)
         if random() > 0.5:
-            if self.cash < 0:
+            if self.cash == 0:
+                return
+            elif self.cash < 0:
                 return self.create_sell_order(price_hat, -self.cash / price_hat)
-            return self.create_buy_order(price_hat, self.cash / price_hat)
+            else:
+                return self.create_buy_order(price_hat, self.cash / price_hat)
         else:
-            if (can_borrow := self.can_borrow(last_price)) < 0:
+            if (can_borrow := self.can_borrow(last_price)) == 0:
+                return
+            elif can_borrow < 0:
                 return self.create_buy_order(price_hat, -can_borrow / price_hat)
-            return self.create_sell_order(price_hat, can_borrow / price_hat)
+            else:
+                return self.create_sell_order(price_hat, can_borrow / price_hat)
