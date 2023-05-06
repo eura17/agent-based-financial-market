@@ -1,8 +1,8 @@
 from collections import defaultdict, Counter
-from statistics import mean, median
+from statistics import mean, median, stdev
 
 from src.core.agent import Order, OrderType, Agent
-from src.core.orderbook import Transaction
+from src.core.orderbook import Transaction, OrderBook
 
 class StatsMonitor:
     def __init__(self) -> None:
@@ -10,6 +10,8 @@ class StatsMonitor:
         self.balance_stats = []
         self.supply_demand_stats = []
         self.trade_stats = []
+        self.period_stats = []
+        self.spreads = []
        
     def log_price(self, price: float) -> None:
         self.prices.append(price)
@@ -100,3 +102,41 @@ class StatsMonitor:
                 )
 
         self.trade_stats.append(stats)
+
+    def log_period_stats(self, transactions: list[Transaction]) -> None:
+        if not transactions:
+            stats = {
+                "total_trades": 0,
+                "total_quantity": 0,
+                "mean_price": None,
+                "std_price": None,
+                "median_price": None,
+                "mean_weighted_price": None,
+            }
+            self.period_stats.append(stats)
+            return
+        
+        stats = Counter()
+        prices, quantities = [], []
+        for transaction in transactions:
+            stats["total_trades"] += 1
+            stats["total_quantity"] += transaction.quantity
+            prices.append(transaction.price)
+            quantities.append(transaction.quantity)
+        stats["mean_price"] = mean(prices)
+        stats["std_price"] = stdev(prices)
+        stats["median_price"] = median(prices)
+        stats["mean_weighted_price"] = (
+            sum([p * q for p, q in zip(prices, quantities)])
+            / sum(quantities, start=1e-8)
+        )
+        self.period_stats.append(stats)
+
+    def log_spread(self, order_book: OrderBook) -> None:
+        self.spreads.append(
+            {
+                "min_ask": order_book.asks.min_price(),
+                "max_bid": order_book.bids.max_price(),
+                "spread": order_book.asks.min_price() - order_book.bids.max_price(),
+            }
+        )
