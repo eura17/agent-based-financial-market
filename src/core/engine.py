@@ -30,9 +30,11 @@ class Engine:
                 orders.append(order)
                 self.order_book.register(order)
         self.stats_monitor.log_supply_demand_stats(orders)
+        self.stats_monitor.log_spread(self.order_book)
         
         transactions = self.order_book.match_orders()
         self.stats_monitor.log_trade_stats(transactions)
+        self.stats_monitor.log_period_stats(transactions)
         cost, volume = 1e-10, 1e-10
         for transaction in transactions:
             transaction.buyer.update_cash(-transaction.cost)

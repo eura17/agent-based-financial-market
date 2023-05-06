@@ -13,6 +13,7 @@ ipykernel = "^6.22.0"
 matplotlib = "^3.7.1"
 pandas = "^2.0.0"
 tqdm = "^4.65.0"
+statsmodels = "^0.13.5"
 
 [build-system]
 requires = ["poetry-core"]
