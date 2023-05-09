@@ -30,7 +30,7 @@ class TrendTrader(TechnicalTrader):
             return
         
         if (max_risk := self.total_equity(last_price) * self.pct) < 0:
-            return
+            max_risk = max(self.cash, self.stocks * last_price) * self.pct
         
         price_diff = abs(ma - last_price) / 2
         if last_price > ma:
@@ -47,7 +47,8 @@ class MeanReversionTrader(TechnicalTrader):
             return
         
         if (max_risk := self.total_equity(last_price) * self.pct) < 0:
-            return
+            max_risk *= -1
+            # return
         
         price_diff = abs(ma - last_price) / 2
         if last_price > ma:
