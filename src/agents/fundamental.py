@@ -34,7 +34,7 @@ class FundamentalTrader(Agent):
         self.price_hat *= (1 + g)
 
         if (max_risk := self.total_equity(last_price) * self.pct) < 0:
-            return
+            max_risk = max(self.cash, self.stocks * last_price) * self.pct
         
         price_diff = abs(self.price_hat - last_price) / 2
         if self.price_hat > last_price:

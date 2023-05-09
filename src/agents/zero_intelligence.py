@@ -11,7 +11,8 @@ class ZeroIntelligenceTrader(Agent):
 
     def make_decision(self, last_price: float) -> Optional[Order]:
         if (max_risk := self.total_equity(last_price)) < 0:
-            return
+            if (max_risk := max(self.cash, self.stocks * last_price)):
+                return
         
         price_hat = uniform((1 - self.noise) * last_price, (1 + self.noise) * last_price)
         if random() > 0.5:

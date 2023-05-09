@@ -1,4 +1,5 @@
 from random import shuffle
+from typing import Optional
 
 from tqdm import tqdm
 
@@ -12,10 +13,18 @@ class Engine:
         self.order_book = OrderBook()
         self.stats_monitor = StatsMonitor()
 
-    def run(self, agents: list[Agent], initial_price: float, n_steps: int = 100) -> None:
+    def run(
+        self, 
+        agents: list[Agent], 
+        initial_price: float, 
+        n_steps: int = 100, 
+        shock: Optional[tuple[int, float]] = None,
+    ) -> None:
         last_price = initial_price
-        for _ in tqdm(range(n_steps)):
+        for i in tqdm(range(n_steps)):
             last_price = self.step(agents, last_price=last_price)
+            if shock and i == shock[0]:
+                last_price *= shock[1]
 
     def step(self, agents: list[Agent], last_price: float) -> float:
         self.stats_monitor.log_price(last_price)
@@ -44,5 +53,4 @@ class Engine:
 
             cost += transaction.cost
             volume += transaction.quantity
- 
         return cost / volume if transactions else last_price            
